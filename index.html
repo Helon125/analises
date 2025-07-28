@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Autismo na Ótica da Bioenergética</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A single-page application with a top navigation bar for thematic sections (O que é, Visão sobre Autismo, Abordagem, Ciência & Crítica, Conclusão). This non-linear structure allows users to explore topics at their own pace, moving beyond a rigid slide-by-slide format. The flow guides the user from foundational concepts to the core theory, its application, and finally, its critical context, ensuring a balanced and comprehensive understanding. Interactive cards, a comparative chart, and a new Gemini API-powered strategy generator are used to deepen engagement and clarify complex points. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Core Principles (Slide 2) -> Goal: Inform -> Viz/Method: Interactive HTML cards -> Interaction: Click to reveal details -> Justification: Breaks down concepts into digestible pieces.
+        - Report Info: Autistic Traits Interpretation (Slide 4) -> Goal: Organize/Compare -> Viz/Method: Two-column interactive list -> Interaction: Hover to highlight connections -> Justification: Directly links signs to theory in an engaging way.
+        - Report Info: Scientific Critique vs. EBP (Slide 7/8) -> Goal: Compare -> Viz/Method: Bar Chart (Chart.js) -> Interaction: Static visual comparison with tooltips -> Justification: Powerfully visualizes the disparity in scientific evidence, a crucial point.
+        - Report Info: Therapeutic Approaches (Slide 5) -> Goal: Engage/Personalize -> Viz/Method: Gemini API-powered suggestion generator -> Interaction: User selects a topic, clicks a button to get AI-generated wellness strategies -> Justification: Adds a dynamic, valuable, and interactive feature that goes beyond static content.
+        - Report Info: Conclusion/Therapy Hierarchy (Slide 8) -> Goal: Inform/Organize -> Viz/Method: HTML/CSS diagram -> Interaction: Static visual -> Justification: Provides a clear visual metaphor for the final recommendation.
+        - Report Info: Two Meanings of "Bioenergetics" (Slide 6) -> Goal: Compare -> Viz/Method: HTML table -> Interaction: Static -> Justification: Clearest way for a side-by-side comparison.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #C07B57;
+            border-bottom-color: #C07B57;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .gemini-loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #C07B57;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-[#4A373F] mb-2">O Autismo na Ótica da Bioenergética</h1>
+            <p class="text-lg text-gray-600">Uma exploração interativa da conexão mente-corpo-energia</p>
+        </header>
+
+        <nav class="flex justify-center flex-wrap gap-x-6 gap-y-2 mb-12 border-b pb-4">
+            <a href="#o-que-e" class="nav-link px-2 py-1 text-lg font-semibold active">O que é</a>
+            <a href="#visao-autismo" class="nav-link px-2 py-1 text-lg font-semibold">A Visão sobre o Autismo</a>
+            <a href="#abordagem" class="nav-link px-2 py-1 text-lg font-semibold">Abordagem Terapêutica</a>
+            <a href="#ciencia-critica" class="nav-link px-2 py-1 text-lg font-semibold">Ciência & Crítica</a>
+            <a href="#conclusao" class="nav-link px-2 py-1 text-lg font-semibold">Conclusão</a>
+        </nav>
+
+        <main id="main-content">
+            
+            <section id="o-que-e" class="content-section active">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#C07B57]">O que é a Análise Bioenergética?</h2>
+                <p class="text-center max-w-3xl mx-auto mb-12 text-lg">
+                    A Análise Bioenergética é uma forma de psicoterapia corporal desenvolvida por Alexander Lowen. Sua premissa é que mente e corpo são inseparáveis e que nossa saúde emocional está diretamente ligada ao livre fluxo de energia através do corpo. Explore os conceitos centrais abaixo.
+                </p>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-xl mb-3 text-[#4A373F]">Unidade Mente-Corpo</h3>
+                        <p>O princípio fundamental de que não há separação: o que acontece na mente reflete no corpo, e vice-versa. Pensamentos, sentimentos e tensões físicas formam uma unidade funcional.</p>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-xl mb-3 text-[#4A373F]">Energia Vital</h3>
+                        <p>Refere-se à "carga" energética de uma pessoa. Um fluxo de energia livre e vibrante pelo corpo é associado à saúde, prazer e espontaneidade. Bloqueios energéticos levam a sintomas emocionais e físicos.</p>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-xl mb-3 text-[#4A373F]">Couraças Musculares</h3>
+                        <p>São tensões musculares crônicas e inconscientes que se formam como defesa contra dores emocionais. Essas "armaduras" restringem a respiração, o movimento e o fluxo de sentimentos.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="visao-autismo" class="content-section">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#C07B57]">Interpretando os Sinais Autistas</h2>
+                 <p class="text-center max-w-3xl mx-auto mb-12 text-lg">
+                    Na ótica da Bioenergética, as características do autismo são vistas como expressões de uma defesa profunda contra um mundo percebido como hostil, resultando em uma "fuga" para a mente e uma desconexão do corpo. Esta visão é associada ao que Lowen chamou de "Caráter Esquizoide" (um termo teórico sem relação com a esquizofrenia).
+                </p>
+                <div class="bg-white p-8 rounded-lg shadow-md border border-gray-200">
+                    <h3 class="text-2xl font-bold text-center mb-6 text-[#4A373F]">Conexão: Sinal e Interpretação</h3>
+                    <div class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-6 items-center">
+                            <div class="font-semibold text-lg p-4 bg-stone-100 rounded-md">Dificuldade de Contato (Visual/Físico)</div>
+                            <div class="p-4 text-gray-700">Visto como uma retirada de energia dos órgãos de percepção (olhos, pele) para se proteger do contato, considerado ameaçador.</div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6 items-center">
+                            <div class="font-semibold text-lg p-4 bg-stone-100 rounded-md">Hipo/Hipersensibilidade</div>
+                            <div class="p-4 text-gray-700">Interpretado como consequência de um fluxo de energia irregular. Áreas com pouca energia seriam hipossensíveis, e áreas com energia "presa" seriam hipersensíveis.</div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6 items-center">
+                            <div class="font-semibold text-lg p-4 bg-stone-100 rounded-md">Movimentos Repetitivos (Stims)</div>
+                            <div class="p-4 text-gray-700">Considerados tentativas do organismo de sentir o próprio corpo, descarregar tensão acumulada e se autorregular energeticamente.</div>
+                        </div>
+                         <div class="grid md:grid-cols-2 gap-6 items-center">
+                            <div class="font-semibold text-lg p-4 bg-stone-100 rounded-md">Isolamento Social</div>
+                            <div class="p-4 text-gray-700">A expressão máxima da defesa de "se fechar" para o mundo externo, mantendo a energia contida dentro de si.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="abordagem" class="content-section">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#C07B57]">Abordagem Terapêutica: O "Enraizamento"</h2>
+                <p class="text-center max-w-3xl mx-auto mb-12 text-lg">
+                    O objetivo terapêutico central é ajudar a pessoa a se sentir segura o suficiente para "habitar" o próprio corpo, conectando-se com suas sensações e com a realidade de forma mais integrada. O foco não é "corrigir", mas sim aumentar a consciência e o fluxo energético.
+                </p>
+                <div class="grid md:grid-cols-3 gap-8 mb-16">
+                    <div class="card bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
+                        <div class="text-4xl mb-4">👣</div>
+                        <h3 class="font-bold text-xl mb-3 text-[#4A373F]">Grounding (Aterramento)</h3>
+                        <p>Exercícios que focam na sensação dos pés firmes no chão. O objetivo é dar segurança, conectar com a realidade física e "puxar" a energia da mente para o corpo.</p>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
+                        <div class="text-4xl mb-4">🌬️</div>
+                        <h3 class="font-bold text-xl mb-3 text-[#4A373F]">Trabalho com a Respiração</h3>
+                        <p>Técnicas para liberar tensões no diafragma e no peito. Uma respiração mais profunda e livre permite que a energia (e os sentimentos) flua com mais facilidade pelo corpo.</p>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
+                        <div class="text-4xl mb-4">🤸</div>
+                        <h3 class="font-bold text-xl mb-3 text-[#4A373F]">Movimentos Expressivos</h3>
+                        <p>Usar o corpo para liberar emoções e tensões contidas, através de sons, vibrações ou movimentos. O objetivo é dar vazão à energia bloqueada.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-lg shadow-md border border-gray-200 mt-12">
+                    <h3 class="text-2xl font-bold text-center mb-2 text-[#4A373F]">✨ Gerador de Estratégias de Bem-Estar</h3>
+                    <p class="text-center text-gray-600 mb-6">Selecione um tema e gere sugestões de exercícios simples para promover a consciência corporal.</p>
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+                        <select id="gemini-topic-selector" class="w-full sm:w-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#C07B57] focus:border-[#C07B57] block p-2.5">
+                            <option value="Grounding (Aterramento)">Grounding (Aterramento)</option>
+                            <option value="Respiração">Respiração</option>
+                            <option value="Movimentos Expressivos">Movimentos Expressivos</option>
+                        </select>
+                        <button id="gemini-generate-btn" class="w-full sm:w-auto bg-[#C07B57] hover:bg-[#a86a4a] text-white font-bold py-2.5 px-5 rounded-lg transition-colors flex items-center justify-center">
+                            Gerar Sugestões
+                        </button>
+                    </div>
+                    <div id="gemini-result-container" class="mt-4 p-6 bg-stone-50 rounded-lg min-h-[150px] flex items-center justify-center">
+                        <p class="text-gray-500">As sugestões aparecerão aqui...</p>
+                    </div>
+                    <p class="text-xs text-center text-gray-500 mt-4">Aviso: As sugestões são geradas por IA e destinam-se ao bem-estar geral e autoconhecimento. Não constituem aconselhamento médico ou terapêutico.</p>
+                </div>
+            </section>
+
+            <section id="ciencia-critica" class="content-section">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#C07B57]">Contexto, Ciência e Críticas</h2>
+                <p class="text-center max-w-3xl mx-auto mb-12 text-lg">
+                    É crucial entender a Bioenergética em seu devido contexto. Ela oferece uma linguagem metafórica para a experiência humana, mas não é uma teoria científica validada para o tratamento do autismo. Abaixo, distinguimos os termos e apresentamos a visão crítica da ciência.
+                </p>
+                
+                <div class="bg-white p-8 rounded-lg shadow-md border border-gray-200 mb-12">
+                     <h3 class="text-2xl font-bold text-center mb-6 text-[#4A373F]">Um Termo, Dois Significados</h3>
+                     <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="p-4 font-bold text-lg">Análise Bioenergética (Psicoterapia)</th>
+                                    <th class="p-4 font-bold text-lg">Bioenergética Celular (Biologia)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="p-4">A teoria de Lowen sobre corpo, emoção e "energia vital". É uma abordagem psicoterapêutica.</td>
+                                    <td class="p-4">O estudo científico de como as células (mitocôndrias) produzem energia (ATP) para o corpo funcionar.</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="p-4 text-sm text-gray-600 italic">
+                                        <strong>Ponte Especulativa:</strong> Curiosamente, pesquisas científicas investigam disfunções mitocondriais em alguns casos de TEA, mas isso não valida a teoria psicoterapêutica de Lowen.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                     </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-lg shadow-md border border-gray-200">
+                    <h3 class="text-2xl font-bold text-center mb-6 text-[#4A373F]">Nível de Evidência Científica</h3>
+                     <p class="text-center max-w-2xl mx-auto mb-8">
+                        O gráfico abaixo compara o nível de evidência científica da Análise Bioenergética com o de Práticas Baseadas em Evidências (PBEs) para o autismo, como a Análise do Comportamento Aplicada (ABA) e a Terapia da Fala.
+                    </p>
+                    <div class="chart-container">
+                        <canvas id="evidenceChart"></canvas>
+                    </div>
+                    <div class="mt-8">
+                        <h4 class="font-bold text-lg text-center mb-4">Principais Críticas da Ciência:</h4>
+                        <ul class="list-disc list-inside max-w-2xl mx-auto space-y-2">
+                            <li><strong>Falta de Evidências:</strong> Não é considerada uma Prática Baseada em Evidências (PBE) para o tratamento do TEA.</li>
+                            <li><strong>Teoria Não Mensurável:</strong> Conceitos como "energia vital" e "couraças" são vistos como metafóricos e não podem ser medidos objetivamente.</li>
+                            <li><strong>Risco de Culpabilização Parental:</strong> A ênfase em experiências da primeira infância é uma visão ultrapassada que pode gerar culpa nos pais.</li>
+                            <li><strong>Posicionamento Oficial:</strong> Não é recomendada pelas principais organizações de saúde como tratamento principal para o autismo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="conclusao" class="content-section">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#C07B57]">Onde a Bioenergética se Encaixa?</h2>
+                <p class="text-center max-w-3xl mx-auto mb-12 text-lg">
+                    A Bioenergética não deve ser vista como um tratamento curativo ou principal para o autismo. Seu valor reside em oferecer uma perspectiva complementar e holística, focada no bem-estar e no autoconhecimento, sempre como apoio às terapias com eficácia comprovada.
+                </p>
+                <div class="bg-white p-8 rounded-lg shadow-md border border-gray-200">
+                    <h3 class="text-2xl font-bold text-center mb-6 text-[#4A373F]">Hierarquia de Apoio Sugerida</h3>
+                    <div class="flex flex-col items-center justify-center space-y-6">
+                        <div class="p-4 border-2 border-[#C07B57] rounded-full text-center">
+                            <div class="font-bold text-xl">Pessoa com TEA</div>
+                        </div>
+                        <div class="w-px h-8 bg-gray-300"></div>
+                        <div class="text-center">
+                            <div class="font-semibold text-lg mb-2">Tratamentos Principais</div>
+                            <div class="flex flex-wrap justify-center gap-4">
+                                <span class="bg-teal-100 text-teal-800 px-4 py-2 rounded-full font-medium">Terapias Baseadas em Evidências (ABA, Fala, Ocupacional, etc.)</span>
+                            </div>
+                        </div>
+                        <div class="w-px h-8 bg-gray-300"></div>
+                        <div class="text-center">
+                             <div class="font-semibold text-lg mb-2">Abordagens de Apoio (Opcional)</div>
+                            <div class="flex flex-wrap justify-center gap-4">
+                               <span class="bg-amber-100 text-amber-800 px-4 py-2 rounded-full font-medium">Bioenergética (para consciência corporal e autorregulação)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t">
+                        <h4 class="font-bold text-lg text-center mb-2">Recomendação Final</h4>
+                        <p class="text-center max-w-3xl mx-auto">
+                            A Bioenergética pode oferecer ferramentas úteis para promover maior consciência corporal, aliviar tensões e servir como um caminho de autoconhecimento. No entanto, deve sempre ser considerada como uma abordagem de apoio, nunca substituindo as terapias com eficácia cientificamente comprovada.
+                        </p>
+                    </div>
+                    <div class="mt-8 pt-6 border-t">
+                        <h4 class="font-bold text-lg text-center mb-2">Dúvidas e Sugestões</h4>
+                        <p class="text-center max-w-3xl mx-auto">
+                            Para dúvidas, sugestões ou para compartilhar sua perspectiva, por favor, entre em contato através do e-mail: 
+                            <a href="mailto:helonjk@gmail.com" class="text-[#C07B57] hover:underline">helonjk@gmail.com</a>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            let evidenceChartInstance = null;
+
+            function updateContent(hash) {
+                const targetHash = hash || '#o-que-e';
+                
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === targetHash);
+                });
+
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetHash.substring(1));
+                });
+                
+                if (targetHash === '#ciencia-critica' && !evidenceChartInstance) {
+                    renderEvidenceChart();
+                }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetHash = this.getAttribute('href');
+                    if (window.location.hash !== targetHash) {
+                        history.pushState(null, null, targetHash);
+                    }
+                    updateContent(targetHash);
+                });
+            });
+            
+            window.addEventListener('popstate', () => {
+                updateContent(window.location.hash);
+            });
+
+            updateContent(window.location.hash);
+
+            function renderEvidenceChart() {
+                const ctx = document.getElementById('evidenceChart').getContext('2d');
+                evidenceChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Análise Bioenergética', 'Práticas Baseadas em Evidências (PBEs)'],
+                        datasets: [{
+                            label: 'Nível de Evidência Científica',
+                            data: [1, 9],
+                            backgroundColor: [
+                                'rgba(239, 179, 133, 0.6)',
+                                'rgba(65, 169, 169, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(239, 179, 133, 1)',
+                                'rgba(65, 169, 169, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 10,
+                                ticks: {
+                                    callback: function(value) {
+                                        if (value === 0) return 'Nenhuma';
+                                        if (value <= 3) return 'Baixa';
+                                        if (value <= 7) return 'Moderada';
+                                        if (value <= 10) return 'Alta';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.raw <= 2) {
+                                            label += 'Baixo/Inexistente';
+                                        } else {
+                                            label += 'Alto/Consolidado';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const generateBtn = document.getElementById('gemini-generate-btn');
+            const topicSelector = document.getElementById('gemini-topic-selector');
+            const resultContainer = document.getElementById('gemini-result-container');
+
+            generateBtn.addEventListener('click', async () => {
+                const topic = topicSelector.value;
+                const prompt = `Gere uma lista de 3 exercícios simples e práticos sobre "${topic}" para promover a consciência corporal e o bem-estar. Apresente como uma lista com títulos em negrito. Não forneça conselhos médicos ou terapêuticos. Fale de forma acolhedora e simples.`;
+
+                resultContainer.innerHTML = '<div class="gemini-loader"></div>';
+                generateBtn.disabled = true;
+                generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+                try {
+                    let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                    const payload = { contents: chatHistory };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        const formattedText = formatGeminiResponse(text);
+                        resultContainer.innerHTML = formattedText;
+                    } else {
+                        throw new Error("Resposta da API inválida ou vazia.");
+                    }
+
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    resultContainer.innerHTML = '<p class="text-red-500">Desculpe, ocorreu um erro ao gerar as sugestões. Tente novamente mais tarde.</p>';
+                } finally {
+                    generateBtn.disabled = false;
+                    generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            });
+
+            function formatGeminiResponse(text) {
+                let html = text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#4A373F]">$1</strong>')
+                    .replace(/\* (.*?)(?=\n\*|\n\n|$)/g, '<li class="mb-2">$1</li>')
+                    .replace(/(<li.*?>)/g, '<ul>$1')
+                    .replace(/<\/li>(?!<li)/g, '</li></ul>');
+                
+                html = html.replace(/<\/ul>\n?<ul>/g, '');
+
+                return `<div class="text-left">${html}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>
