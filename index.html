@@ -439,13 +439,27 @@
             });
 
             function formatGeminiResponse(text) {
-                let html = text
-                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#4A373F]">$1</strong>')
-                    .replace(/\* (.*?)(?=\n\*|\n\n|$)/g, '<li class="mb-2">$1</li>')
-                    .replace(/(<li.*?>)/g, '<ul>$1')
-                    .replace(/<\/li>(?!<li)/g, '</li></ul>');
-                
-                html = html.replace(/<\/ul>\n?<ul>/g, '');
+                const blocks = text.split(/\n\s*\n/);
+                let html = '';
+
+                blocks.forEach(block => {
+                    const trimmedBlock = block.trim();
+                    if (trimmedBlock.length === 0) return;
+
+                    if (trimmedBlock.startsWith('*') || trimmedBlock.startsWith('-')) {
+                        html += '<ul class="list-disc list-inside space-y-2 mb-4">';
+                        const items = trimmedBlock.split('\n');
+                        items.forEach(item => {
+                            let content = item.trim().substring(1).trim();
+                            content = content.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#4A373F]">$1</strong>');
+                            html += `<li class="mb-2">${content}</li>`;
+                        });
+                        html += '</ul>';
+                    } else {
+                        const processedBlock = trimmedBlock.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#4A373F]">$1</strong>');
+                        html += `<p class="mb-4">${processedBlock}</p>`;
+                    }
+                });
 
                 return `<div class="text-left">${html}</div>`;
             }
